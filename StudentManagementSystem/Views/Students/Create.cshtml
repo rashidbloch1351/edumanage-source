@@ -1,0 +1,134 @@
+@model StudentCreateViewModel
+@{
+    ViewData["Title"] = "Add Student";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Add New Student</h1>
+        <p class="page-subtitle">Fill in the details below to register a new student.</p>
+    </div>
+    <a href="@Url.Action("Index", "Students")" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Students
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-4">
+                <!-- Personal Information -->
+                <div class="col-12">
+                    <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size:12px; letter-spacing:1px;">
+                        <i class="bi bi-person me-1"></i> Personal Information
+                    </h6>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="AdmissionNumber" class="form-label"></label>
+                    <input asp-for="AdmissionNumber" class="form-control" placeholder="e.g., STU-2024-001" />
+                    <span asp-validation-for="AdmissionNumber" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                    <span asp-validation-for="FirstName" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="LastName" class="form-label"></label>
+                    <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                    <span asp-validation-for="LastName" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" placeholder="student@example.com" />
+                    <span asp-validation-for="Email" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <input asp-for="Phone" class="form-control" placeholder="+1 (555) 000-0000" />
+                    <span asp-validation-for="Phone" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="DateOfBirth" class="form-label"></label>
+                    <input asp-for="DateOfBirth" class="form-control" type="date" />
+                    <span asp-validation-for="DateOfBirth" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Gender" class="form-label"></label>
+                    <select asp-for="Gender" class="form-select">
+                        <option value="">— Select Gender —</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                        <option value="PreferNotToSay">Prefer Not to Say</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-8">
+                    <label asp-for="Address" class="form-label"></label>
+                    <input asp-for="Address" class="form-control" placeholder="Street address, city, state" />
+                    <span asp-validation-for="Address" class="field-validation-error"></span>
+                </div>
+
+                <!-- Academic Information -->
+                <div class="col-12 mt-4">
+                    <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size:12px; letter-spacing:1px;">
+                        <i class="bi bi-book me-1"></i> Academic Information
+                    </h6>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Course" class="form-label"></label>
+                    <input asp-for="Course" class="form-control" placeholder="e.g., Computer Science" />
+                    <span asp-validation-for="Course" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ClassName" class="form-label"></label>
+                    <input asp-for="ClassName" class="form-control" placeholder="e.g., CS-101A" />
+                    <span asp-validation-for="ClassName" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="EnrollmentDate" class="form-label"></label>
+                    <input asp-for="EnrollmentDate" class="form-control" type="date" />
+                    <span asp-validation-for="EnrollmentDate" class="field-validation-error"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Status" class="form-label"></label>
+                    <select asp-for="Status" class="form-select">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Graduated">Graduated</option>
+                    </select>
+                    <span asp-validation-for="Status" class="field-validation-error"></span>
+                </div>
+
+                <!-- Actions -->
+                <div class="col-12 mt-4 pt-3 border-top">
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg"></i> Save Student
+                        </button>
+                        <a href="@Url.Action("Index", "Students")" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

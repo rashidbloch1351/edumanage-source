@@ -1,0 +1,206 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Welcome back! Here's an overview of your student records.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Create", "Students")" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add Student
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card primary">
+            <div class="stat-card-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-card-value">@Model.TotalStudents</div>
+            <div class="stat-card-label">Total Students</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card success">
+            <div class="stat-card-icon">
+                <i class="bi bi-person-check-fill"></i>
+            </div>
+            <div class="stat-card-value">@Model.ActiveStudents</div>
+            <div class="stat-card-label">Active Students</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card warning">
+            <div class="stat-card-icon">
+                <i class="bi bi-person-dash-fill"></i>
+            </div>
+            <div class="stat-card-value">@Model.InactiveStudents</div>
+            <div class="stat-card-label">Inactive Students</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card info">
+            <div class="stat-card-icon">
+                <i class="bi bi-award-fill"></i>
+            </div>
+            <div class="stat-card-value">@Model.GraduatedStudents</div>
+            <div class="stat-card-label">Graduated</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Recent Students -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-clock-history me-2"></i>Recently Added Students</span>
+                <a href="@Url.Action("Index", "Students")" class="btn btn-sm btn-outline-primary">
+                    View All <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.RecentStudents.Any())
+                {
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Admission #</th>
+                                    <th>Course</th>
+                                    <th>Enrolled</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var student in Model.RecentStudents)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="@Url.Action("Details", "Students", new { id = student.Id })" class="fw-semibold">
+                                                @student.FullName
+                                            </a>
+                                        </td>
+                                        <td><code>@student.AdmissionNumber</code></td>
+                                        <td>@student.Course</td>
+                                        <td>@student.EnrollmentDate.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            <span class="status-badge status-@student.Status.ToLower()">
+                                                @student.Status
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <div class="empty-state-title">No Students Yet</div>
+                        <p class="empty-state-text">Start by adding your first student record.</p>
+                        <a href="@Url.Action("Create", "Students")" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i> Add First Student
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="col-lg-4">
+        <!-- Status Distribution -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-pie-chart-fill me-2"></i>Status Distribution
+            </div>
+            <div class="card-body">
+                @if (Model.StudentsByStatus.Any())
+                {
+                    @foreach (var status in Model.StudentsByStatus)
+                    {
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-medium" style="font-size:13px;">@status.Status</span>
+                                <span class="text-muted" style="font-size:13px;">@status.Count (@status.Percentage%)</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-@status.CssClass"
+                                     role="progressbar"
+                                     style="width: @status.Percentage%"
+                                     aria-valuenow="@status.Percentage"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center mb-0" style="font-size:14px;">No data available</p>
+                }
+            </div>
+        </div>
+
+        <!-- Course Distribution -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-book-fill me-2"></i>Students by Course
+            </div>
+            <div class="card-body">
+                @if (Model.StudentsByCourse.Any())
+                {
+                    @foreach (var course in Model.StudentsByCourse)
+                    {
+                        <div class="course-item">
+                            <span class="course-name">@course.Course</span>
+                            <span class="course-count">
+                                <span class="badge bg-primary bg-opacity-10 text-primary">@course.Count</span>
+                            </span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center mb-0" style="font-size:14px;">No courses found</p>
+                }
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-lightning-fill me-2"></i>Quick Info
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted" style="font-size:13px;">New (Last 30 Days)</span>
+                    <span class="fw-semibold">@Model.RecentEnrollments</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted" style="font-size:13px;">Total Courses</span>
+                    <span class="fw-semibold">@Model.StudentsByCourse.Count</span>
+                </div>
+                <div class="d-flex justify-content-between py-2">
+                    <span class="text-muted" style="font-size:13px;">Active Rate</span>
+                    <span class="fw-semibold text-success">
+                        @(Model.TotalStudents > 0 ? Math.Round(Model.ActiveStudents * 100.0 / Model.TotalStudents, 1) : 0)%
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

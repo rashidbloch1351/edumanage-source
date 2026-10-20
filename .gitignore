@@ -1,0 +1,27 @@
+## .NET & Visual Studio
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+.vs/
+.idea/
+.vscode/
+
+## SQLite & DB
+*.db
+*.db-wal
+*.db-shm
+
+## Build & Publish
+publish/
+appsettings.Production.json
+secrets.json
+
+## OS files
+.DS_Store
+Thumbs.db

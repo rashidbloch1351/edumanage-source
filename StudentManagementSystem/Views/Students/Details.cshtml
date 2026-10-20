@@ -1,0 +1,140 @@
+@model StudentDetailsViewModel
+@{
+    ViewData["Title"] = "Student Details";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">@Model.FullName</h1>
+        <p class="page-subtitle">Student Details • @Model.AdmissionNumber</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Edit", "Students", new { id = Model.Id })" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a href="@Url.Action("Delete", "Students", new { id = Model.Id })" class="btn btn-outline-danger">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+        <a href="@Url.Action("Index", "Students")" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Personal Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-person me-2"></i> Personal Information
+            </div>
+            <div class="card-body">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Admission Number</div>
+                        <div class="detail-value"><code>@Model.AdmissionNumber</code></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">First Name</div>
+                        <div class="detail-value">@Model.FirstName</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Last Name</div>
+                        <div class="detail-value">@Model.LastName</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email Address</div>
+                        <div class="detail-value">
+                            <a href="mailto:@Model.Email">@Model.Email</a>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Phone Number</div>
+                        <div class="detail-value">@(Model.Phone ?? "Not provided")</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Date of Birth</div>
+                        <div class="detail-value">
+                            @(Model.DateOfBirth?.ToString("MMMM dd, yyyy") ?? "Not provided")
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Gender</div>
+                        <div class="detail-value">@(Model.Gender?.ToString() ?? "Not specified")</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Address</div>
+                        <div class="detail-value">@(Model.Address ?? "Not provided")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Academic Information -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-book me-2"></i> Academic Information
+            </div>
+            <div class="card-body">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Course</div>
+                        <div class="detail-value">@Model.Course</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Class</div>
+                        <div class="detail-value">@(Model.ClassName ?? "Not assigned")</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Enrollment Date</div>
+                        <div class="detail-value">@Model.EnrollmentDate.ToString("MMMM dd, yyyy")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Status Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-info-circle me-2"></i> Status
+            </div>
+            <div class="card-body text-center py-4">
+                @{
+                    var statusClass = Model.Status switch
+                    {
+                        StudentStatus.Active => "success",
+                        StudentStatus.Inactive => "warning",
+                        StudentStatus.Graduated => "info",
+                        _ => "secondary"
+                    };
+                }
+                <span class="status-badge status-@Model.Status.ToString().ToLower()" style="font-size:16px; padding:8px 24px;">
+                    @Model.Status
+                </span>
+            </div>
+        </div>
+
+        <!-- Record Info -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clock-history me-2"></i> Record Info
+            </div>
+            <div class="card-body">
+                <div class="detail-item">
+                    <div class="detail-label">Created At</div>
+                    <div class="detail-value" style="font-size:13px;">
+                        @Model.CreatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt") UTC
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Last Updated</div>
+                    <div class="detail-value" style="font-size:13px;">
+                        @(Model.UpdatedAt?.ToString("MMMM dd, yyyy 'at' hh:mm tt") ?? "Never modified") @(Model.UpdatedAt.HasValue ? "UTC" : "")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

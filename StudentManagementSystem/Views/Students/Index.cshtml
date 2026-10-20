@@ -1,0 +1,262 @@
+@model StudentListViewModel
+@{
+    ViewData["Title"] = "Students";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Students</h1>
+        <p class="page-subtitle">Manage all student records • @Model.TotalRecords total</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Export", "Students", new { searchTerm = Model.SearchTerm, courseFilter = Model.CourseFilter, statusFilter = Model.StatusFilter })"
+           class="btn btn-outline-primary" title="Export to CSV">
+            <i class="bi bi-download"></i> Export
+        </a>
+        <a href="@Url.Action("Create", "Students")" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add Student
+        </a>
+    </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="filter-bar">
+    <form method="get" asp-action="Index">
+        <div class="row g-3 align-items-end">
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label">Search</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control"
+                           placeholder="Name, admission #, or email..." />
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3">
+                <label class="form-label">Course</label>
+                <select name="courseFilter" class="form-select">
+                    <option value="">All Courses</option>
+                    @foreach (var course in Model.AvailableCourses)
+                    {
+                        <option value="@course" selected="@(Model.CourseFilter == course)">@course</option>
+                    }
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-3">
+                <label class="form-label">Status</label>
+                <select name="statusFilter" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
+                    <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactive</option>
+                    <option value="Graduated" selected="@(Model.StatusFilter == "Graduated")">Graduated</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-3">
+                <label class="form-label">Page Size</label>
+                <select name="pageSize" class="form-select">
+                    <option value="10" selected="@(Model.PageSize == 10)">10 per page</option>
+                    <option value="25" selected="@(Model.PageSize == 25)">25 per page</option>
+                    <option value="50" selected="@(Model.PageSize == 50)">50 per page</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-3">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary" title="Reset filters">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="sortBy" value="@Model.SortBy" />
+        <input type="hidden" name="sortDirection" value="@Model.SortDirection" />
+    </form>
+</div>
+
+<!-- Students Table -->
+<div class="card">
+    <div class="card-body p-0">
+        @if (Model.Students.Any())
+        {
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="@SortUrl("admission")" class="sort-link">
+                                    Admission #
+                                    @SortIcon("admission")
+                                </a>
+                            </th>
+                            <th>
+                                <a href="@SortUrl("name")" class="sort-link">
+                                    Student Name
+                                    @SortIcon("name")
+                                </a>
+                            </th>
+                            <th>
+                                <a href="@SortUrl("email")" class="sort-link">
+                                    Email
+                                    @SortIcon("email")
+                                </a>
+                            </th>
+                            <th>Phone</th>
+                            <th>
+                                <a href="@SortUrl("course")" class="sort-link">
+                                    Course
+                                    @SortIcon("course")
+                                </a>
+                            </th>
+                            <th>
+                                <a href="@SortUrl("enrollment")" class="sort-link">
+                                    Enrolled
+                                    @SortIcon("enrollment")
+                                </a>
+                            </th>
+                            <th>
+                                <a href="@SortUrl("status")" class="sort-link">
+                                    Status
+                                    @SortIcon("status")
+                                </a>
+                            </th>
+                            <th style="width:120px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.Students)
+                        {
+                            <tr>
+                                <td><code>@student.AdmissionNumber</code></td>
+                                <td>
+                                    <a href="@Url.Action("Details", "Students", new { id = student.Id })" class="fw-semibold">
+                                        @student.FullName
+                                    </a>
+                                </td>
+                                <td>@student.Email</td>
+                                <td>@(student.Phone ?? "—")</td>
+                                <td>@student.Course</td>
+                                <td>@student.EnrollmentDate.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <span class="status-badge status-@student.Status.ToString().ToLower()">
+                                        @student.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="@Url.Action("Details", "Students", new { id = student.Id })"
+                                           class="btn-action view" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("Edit", "Students", new { id = student.Id })"
+                                           class="btn-action edit" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="@Url.Action("Delete", "Students", new { id = student.Id })"
+                                           class="btn-action delete" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="d-flex align-items-center justify-content-between px-3 py-3 border-top">
+                    <span class="text-muted" style="font-size:13px;">
+                        Showing @(((Model.CurrentPage - 1) * Model.PageSize) + 1)–@(Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalRecords)) of @Model.TotalRecords
+                    </span>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link" href="@PageUrl(Model.CurrentPage - 1)">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="@PageUrl(i)">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="@PageUrl(Model.CurrentPage + 1)">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) || !string.IsNullOrWhiteSpace(Model.CourseFilter) || !string.IsNullOrWhiteSpace(Model.StatusFilter))
+                {
+                    <div class="empty-state-title">No Results Found</div>
+                    <p class="empty-state-text">No students match your search criteria. Try adjusting your filters.</p>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                        <i class="bi bi-x-lg"></i> Clear Filters
+                    </a>
+                }
+                else
+                {
+                    <div class="empty-state-title">No Students Yet</div>
+                    <p class="empty-state-text">Get started by adding your first student record.</p>
+                    <a href="@Url.Action("Create", "Students")" class="btn btn-primary">
+                        <i class="bi bi-plus-lg"></i> Add First Student
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    string PageUrl(int page)
+    {
+        return Url.Action("Index", new
+        {
+            page,
+            pageSize = Model.PageSize,
+            searchTerm = Model.SearchTerm,
+            courseFilter = Model.CourseFilter,
+            statusFilter = Model.StatusFilter,
+            sortBy = Model.SortBy,
+            sortDirection = Model.SortDirection
+        })!;
+    }
+
+    string SortUrl(string column)
+    {
+        var direction = Model.SortBy == column && Model.SortDirection == "asc" ? "desc" : "asc";
+        return Url.Action("Index", new
+        {
+            page = 1,
+            pageSize = Model.PageSize,
+            searchTerm = Model.SearchTerm,
+            courseFilter = Model.CourseFilter,
+            statusFilter = Model.StatusFilter,
+            sortBy = column,
+            sortDirection = direction
+        })!;
+    }
+
+    Microsoft.AspNetCore.Html.IHtmlContent SortIcon(string column)
+    {
+        if (Model.SortBy != column)
+            return new Microsoft.AspNetCore.Html.HtmlString("<i class='bi bi-arrow-down-up' style='opacity:0.3;'></i>");
+        return Model.SortDirection == "desc"
+            ? new Microsoft.AspNetCore.Html.HtmlString("<i class='bi bi-sort-down'></i>")
+            : new Microsoft.AspNetCore.Html.HtmlString("<i class='bi bi-sort-up'></i>");
+    }
+}

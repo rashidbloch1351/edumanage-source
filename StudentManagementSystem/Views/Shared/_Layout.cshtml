@@ -1,0 +1,158 @@
+@using Microsoft.AspNetCore.Identity
+@using StudentManagementSystem.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — EduManage</title>
+    <meta name="description" content="EduManage — Student Management System for school administrators." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
+</head>
+<body>
+    @{
+        var currentUser = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
+        var currentPath = Context.Request.Path.Value?.ToLower() ?? "";
+    }
+    @if (SignInManager.IsSignedIn(User))
+    {
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <div class="app-wrapper">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-brand">
+                    <div class="sidebar-brand-icon">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
+                    <div class="sidebar-brand-text">
+                        EduManage
+                        <small>Student Management</small>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <div class="sidebar-nav-label">Main</div>
+                    <a href="@Url.Action("Index", "Dashboard")"
+                       class="sidebar-link @(currentPath.Contains("/dashboard") ? "active" : "")">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                        Dashboard
+                    </a>
+
+                    <div class="sidebar-nav-label">Management</div>
+                    <a href="@Url.Action("Index", "Students")"
+                       class="sidebar-link @(currentPath.Contains("/students") && !currentPath.Contains("/create") ? "active" : "")">
+                        <i class="bi bi-people-fill"></i>
+                        All Students
+                    </a>
+                    <a href="@Url.Action("Create", "Students")"
+                       class="sidebar-link @(currentPath.Contains("/students/create") ? "active" : "")">
+                        <i class="bi bi-person-plus-fill"></i>
+                        Add Student
+                    </a>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <div class="sidebar-user">
+                        <div class="sidebar-user-avatar">
+                            @(currentUser?.FullName?.FirstOrDefault().ToString().ToUpper() ?? "A")
+                        </div>
+                        <div class="sidebar-user-info">
+                            <div class="sidebar-user-name">@(currentUser?.FullName ?? "Administrator")</div>
+                            <div class="sidebar-user-role">Administrator</div>
+                        </div>
+                    </div>
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="sidebar-link w-100" style="border:none; cursor:pointer;">
+                            <i class="bi bi-box-arrow-left"></i>
+                            Sign Out
+                        </button>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <header class="top-header">
+                    <button class="mobile-toggle" id="sidebarToggle" type="button" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <span class="top-header-title">@ViewData["Title"]</span>
+                    <div class="top-header-actions">
+                        <span class="text-muted d-none d-md-inline" style="font-size:13px;">
+                            <i class="bi bi-person-circle me-1"></i>
+                            @(currentUser?.FullName ?? User.Identity?.Name)
+                        </span>
+                    </div>
+                </header>
+
+                <main class="page-content">
+                    <!-- Notifications -->
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill"></i>
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @if (TempData["Warning"] != null)
+                    {
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                            @TempData["Warning"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @RenderBody()
+                </main>
+
+                <footer class="app-footer">
+                    &copy; @DateTime.Now.Year <strong>EduManage</strong> — Student Management System. All rights reserved.
+                </footer>
+            </div>
+        </div>
+    }
+    else
+    {
+        @RenderBody()
+    }
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery for unobtrusive validation -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.20.0/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
+    <!-- Custom JS -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
